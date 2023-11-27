@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/rshelekhov/url-shortener/internal/config"
+	"github.com/rshelekhov/url-shortener/internal/lib/logger/sl"
 	"github.com/rshelekhov/url-shortener/internal/storage/postgres"
 	"github.com/rshelekhov/url-shortener/pkg/logs"
 	"log/slog"
@@ -19,14 +20,14 @@ func main() {
 
 	storage, err := postgres.NewStorage(cfg.DatabaseURL)
 	if err != nil {
-		log.Error("failed to init storage: ", err)
+		log.Error("failed to init storage: ", sl.Err(err))
 		os.Exit(1)
 	}
 
 	defer func(storage *postgres.Storage) {
 		err := storage.Close()
 		if err != nil {
-			log.Error("failed to close storage")
+			log.Error("failed to close storage: ", sl.Err(err))
 			os.Exit(1)
 		}
 	}(storage)
