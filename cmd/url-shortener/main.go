@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"github.com/rshelekhov/url-shortener/internal/config"
+	"github.com/rshelekhov/url-shortener/pkg/logs"
+	"log/slog"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
-	fmt.Println(cfg)
+	log := logs.SetupLogger(cfg.Env)
 
-	// TODO: init logger: slog
+	log.Info("starting url-shortener", slog.String("env", cfg.Env))
+	log.Debug("debug messages are enabled")
 
 	// TODO: init storage: sqlite
 
