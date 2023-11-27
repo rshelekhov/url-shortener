@@ -11,12 +11,12 @@ import (
 func main() {
 	cfg := config.MustLoad()
 
+	// TODO: save logs to file
 	log := logs.SetupLogger(cfg.Env)
 
 	log.Info("starting url-shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
-	// TODO: init storage: postgres
 	storage, err := postgres.NewStorage(cfg.DatabaseURL)
 	if err != nil {
 		log.Error("failed to init storage: ", err)
