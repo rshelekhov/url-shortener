@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/rshelekhov/url-shortener/internal/config"
+	"github.com/rshelekhov/url-shortener/internal/storage/postgres"
 	"github.com/rshelekhov/url-shortener/pkg/logs"
 	"log/slog"
+	"os"
 )
 
 func main() {
@@ -14,7 +16,20 @@ func main() {
 	log.Info("starting url-shortener", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
-	// TODO: init storage: sqlite
+	// TODO: init storage: postgres
+	storage, err := postgres.NewStorage(cfg.DatabaseURL)
+	if err != nil {
+		log.Error("failed to init storage: ", err)
+		os.Exit(1)
+	}
+
+	defer func(storage *postgres.Storage) {
+		err := storage.Close()
+		if err != nil {
+			log.Error("failed to close storage")
+			os.Exit(1)
+		}
+	}(storage)
 
 	// TODO: init router: chi, "chi render"
 
