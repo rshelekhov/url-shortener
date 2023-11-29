@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/rshelekhov/url-shortener/internal/config"
 	"github.com/rshelekhov/url-shortener/internal/lib/logger/sl"
 	"github.com/rshelekhov/url-shortener/internal/storage/postgres"
@@ -32,7 +33,7 @@ func main() {
 		}
 	}(storage)
 
-	// TODO: init router: chi, "chi render"
+	router := chi.NewRouter()
 
 	// TODO: run server
 }
