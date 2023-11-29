@@ -28,10 +28,12 @@ func NewStorage(dsn string) (*Storage, error) {
 	return &Storage{db}, nil
 }
 
+// Close method
 func (s *Storage) Close() error {
 	return s.db.Close()
 }
 
+// SaveURL method
 func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
 	const fn = "storage.postgres.SaveURL"
 
@@ -49,4 +51,22 @@ func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
 	}
 
 	return lastInsertId, nil
+}
+
+// GetURL method
+func (s *Storage) GetURL(alias string) (string, error) {
+	const fn = "storage.postgres.GetURL"
+	var resURL string
+
+	sqlStatement := `SELECT * FROM users WHERE id=$1`
+	row := s.db.QueryRow(sqlStatement, alias)
+	err := row.Scan(&resURL)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", storage.ErrURLNotFound
+		}
+		return "", fmt.Errorf("%s: execute statement: %w", fn, err)
+	}
+
+	return resURL, nil
 }
