@@ -2,7 +2,9 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/rshelekhov/url-shortener/internal/storage"
 )
@@ -33,11 +35,17 @@ func (s *Storage) Close() error {
 func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
 	const fn = "storage.postgres.SaveURL"
 
+	sqlStatement := `INSERT INTO url(url, alias) VALUES($1, $2) RETURNING id`
 	var lastInsertId int64
-	err := s.db.QueryRow("INSERT INTO url(url, alias) VALUES($1, $2) RETURNING id", urlToSave, alias).Scan(&lastInsertId)
-
+	err := s.db.QueryRow(sqlStatement, urlToSave, alias).Scan(&lastInsertId)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", fn, storage.ErrURLExists)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == storage.UniqueConstraintViolation {
+				return 0, fmt.Errorf("%s: %w", fn, storage.ErrURLExists)
+			}
+		}
+		return 0, fmt.Errorf("%s: %w", fn, err)
 	}
 
 	return lastInsertId, nil
