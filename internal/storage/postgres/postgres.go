@@ -58,6 +58,8 @@ func (s *Storage) GetURL(alias string) (string, error) {
 	const fn = "storage.postgres.GetURL"
 	var resURL string
 
+	// TODO: fix table name to `url`
+	// TODO: fix column name to 'alias'
 	sqlStatement := `SELECT * FROM users WHERE id=$1`
 	row := s.db.QueryRow(sqlStatement, alias)
 	err := row.Scan(&resURL)
@@ -69,4 +71,17 @@ func (s *Storage) GetURL(alias string) (string, error) {
 	}
 
 	return resURL, nil
+}
+
+// DeleteURL method
+func (s *Storage) DeleteURL(alias string) error {
+	const fn = "storage.postgres.DeleteURL"
+
+	sqlStatement := `DELETE FROM url WHERE alias=$1`
+	_, err := s.db.Exec(sqlStatement, alias)
+	if err != nil {
+		return fmt.Errorf("%s: %w", fn, err)
+	}
+
+	return nil
 }
