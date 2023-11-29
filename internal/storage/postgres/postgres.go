@@ -58,9 +58,7 @@ func (s *Storage) GetURL(alias string) (string, error) {
 	const fn = "storage.postgres.GetURL"
 	var resURL string
 
-	// TODO: fix table name to `url`
-	// TODO: fix column name to 'alias'
-	sqlStatement := `SELECT * FROM users WHERE id=$1`
+	sqlStatement := `SELECT * FROM url WHERE alias=$1`
 	row := s.db.QueryRow(sqlStatement, alias)
 	err := row.Scan(&resURL)
 	if err != nil {
