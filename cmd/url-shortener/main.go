@@ -10,6 +10,7 @@ import (
 	"github.com/rshelekhov/url-shortener/internal/storage/postgres"
 	"github.com/rshelekhov/url-shortener/pkg/logs"
 	"log/slog"
+	"net/http"
 	"os"
 )
 
@@ -46,5 +47,17 @@ func main() {
 
 	router.Post("/url", save.New(log, storage))
 
-	// TODO: run server
+	srv := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
+
+	log.Error("server stopped")
 }
