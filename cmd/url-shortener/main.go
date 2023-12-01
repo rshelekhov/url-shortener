@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/rshelekhov/url-shortener/internal/config"
+	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/url/save"
 	mwLogger "github.com/rshelekhov/url-shortener/internal/http-server/middleware/logger"
 	"github.com/rshelekhov/url-shortener/internal/lib/logger/sl"
 	"github.com/rshelekhov/url-shortener/internal/storage/postgres"
@@ -38,9 +39,12 @@ func main() {
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
 	router.Use(mwLogger.New(log))
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
+
+	router.Post("/url", save.New(log, storage))
 
 	// TODO: run server
 }
