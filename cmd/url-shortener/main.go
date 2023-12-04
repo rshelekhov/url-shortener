@@ -4,7 +4,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/rshelekhov/url-shortener/internal/config"
-	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/url/redirect"
+	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/redirect"
 	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/url/remove"
 	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/url/save"
 	mwLogger "github.com/rshelekhov/url-shortener/internal/http-server/middleware/logger"
