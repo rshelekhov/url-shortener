@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/rshelekhov/url-shortener/internal/config"
+	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/url/redirect"
 	"github.com/rshelekhov/url-shortener/internal/http-server/handlers/url/save"
 	mwLogger "github.com/rshelekhov/url-shortener/internal/http-server/middleware/logger"
 	"github.com/rshelekhov/url-shortener/internal/lib/logger/sl"
@@ -20,7 +21,10 @@ func main() {
 	// TODO: save logs to file
 	log := logs.SetupLogger(cfg.Env)
 
-	log.Info("starting url-shortener", slog.String("env", cfg.Env))
+	log.Info(
+		"starting url-shortener",
+		slog.String("env", cfg.Env),
+		slog.String("version", "1"))
 	log.Debug("debug messages are enabled")
 
 	storage, err := postgres.NewStorage(cfg.DatabaseURL)
@@ -46,6 +50,7 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	router.Post("/url", save.New(log, storage))
+	router.Get("/{alias}", redirect.New(log, storage))
 
 	srv := &http.Server{
 		Addr:         cfg.Address,
